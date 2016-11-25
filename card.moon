@@ -22,6 +22,9 @@ class
 		unless @name
 			error "Card was finalized without name"
 
+		unless @type
+			error "Card was finalized without type"
+
 		@finalized = true
 
 	playable: =>

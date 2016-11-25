@@ -6,6 +6,8 @@ class
 
 		@registeredCards = {}
 
+		@finalized = false
+
 	registerCard: (card) =>
 		table.insert @registeredCards, card
 
@@ -33,4 +35,6 @@ class
 			for i = 1, #allCards / #@players
 				table.insert player.cardsInHand,
 					allCards[math.floor i + (#allCards/#@players) * (playerId - 1)]
+
+		@finalized = true
 

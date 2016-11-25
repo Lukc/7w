@@ -27,20 +27,16 @@ for _, player in ipairs answer.players
 		print "    -", card.name
 
 for line in io.stdin\lines!
+	arg = [arg for arg in line\gmatch "%S*"]
+
 	local name, cardIndex
 
-	requestType = line\gsub " .*", ""
+	requestType = arg[1]
 
 	if requestType == "setname"
-		name = line\gsub "^setname *", ""
-		print "name is #{name}"
+		name = arg[2]
 	elseif requestType == "play"
-		index = line\gsub "^play *", ""
-		index = tonumber index
-
-		print "playing card n°#{index}"
-
-		cardIndex = index
+		cardIndex = tonumber arg[2]
 
 	client\send json.encode {
 		type: requestType,
@@ -59,10 +55,10 @@ for line in io.stdin\lines!
 		io.stdout\write (json.encode answer), "\n"
 
 		for _, player in ipairs answer.players
-			print player.name
+			print "#{player.name} (#{player.played and "waiting" or "playing"})"
 
-			for _, cardName in ipairs player.playedCards
-				print "  - ", cardName
+			for _, card in ipairs player.playedCards
+				print "  - ", card.name
 	else
 		io.stdout\write (json.encode answer), "\n"
 

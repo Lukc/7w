@@ -76,7 +76,7 @@ handle = (message, client) ->
 			allEnded = true
 
 			for _, player in ipairs game.players
-				allEnded and= player.endOfTurn
+				allEnded and= player.action.type != nil
 
 				unless allEnded
 					break
@@ -96,6 +96,7 @@ handle = (message, client) ->
 			turn: game.turn,
 			players: [{
 				name: player.name,
+				played: player.action.type != nil,
 				playedCards: [{
 					name: card.name
 				} for _, card in ipairs player.playedCards]

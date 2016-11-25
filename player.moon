@@ -12,6 +12,8 @@ class
 		@playedCards = {}
 		@cardsInHand = {}
 
+		@action = {}
+
 		@\updateTokens!
 
 	canPlayCard: (card) =>
@@ -37,21 +39,27 @@ class
 		unless card\playable!
 			error "Not a playable Card!"
 
-		if @endOfTurn
-			error "Tried to play twice per turn."
-
-		for index, element in ipairs @cardsInHand
-			if element == card
-				table.remove @cardsInHand, index
-
-				break
-
-		table.insert @playedCards, card
-
-		@endOfTurn = true
+		@action = {
+			type: "play card",
+			:card
+		}
 
 	nextTurn: =>
-		@endOfTurn = false
+		switch @action.type
+			when "play card"
+				for index, element in ipairs @cardsInHand
+					if element == @action.card
+						table.remove @cardsInHand, index
+
+						break
+
+				table.insert @playedCards, @action.card
+			else
+				return nil, "has not played"
+
+		@action = {}
+
+		true
 
 	updateTokens: =>
 		tokens = {}
