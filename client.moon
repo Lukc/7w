@@ -50,7 +50,7 @@ for line in io.stdin\lines!
 
 	if line == "hand"
 		for index, card in ipairs answer
-			io.stdout\write "  - (#{index}) #{card.name}\n"
+			io.stdout\write "  - (#{index}) #{card}\n"
 	elseif line == "show"
 		io.stdout\write (json.encode answer), "\n"
 

@@ -112,9 +112,7 @@ handle = (message, client) ->
 
 		player = game.players[request.player]
 
-		client\send json.encode [{
-			name: card.name
-		} for _, card in ipairs player.cardsInHand]
+		client\send json.encode [card.name for _, card in ipairs player.cardsInHand]
 		client\send "\n"
 	else
 		client\send json.encode "the fuck is this '#{request.type}'"
