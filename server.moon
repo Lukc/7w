@@ -3,117 +3,14 @@ Token = require "token"
 UnionToken = require "union_token"
 Card = require "card"
 
--- Base resources
-Dilithium = with Token "Dilithium"
-	.color = {63, 127, 255}
-
-Metals = with Token "Metals"
-	.color = {193, 193, 193}
-
-Supplies = with Token "Supplies"
-	.color = {255, 255, 63}
-
-Crew = with Token "Crew"
-	.color = {127, 255, 127}
-
--- Special effect resources
-Military = with Token "Military"
-	.color = {255, 63, 63}
-
--- Special resources
-Science = with Token "Science"
-	.color = {127, 127, 127}
-
-allCards = {
-	with Card!
-		.name = "Dilithium Mine"
-		.type = Card.Resource
-
-		\onTurn Dilithium
-
-		\finalize!
-
-	with Card!
-		.name = "Shipyard"
-		.type = Card.Military
-
-		\onTurn Military
-
-		\finalize!
-
-	with Card!
-		.name = "Starbase"
-		.type = Card.Military
-
-		\onTurn Military
-		\onTurn Military
-		\onTurn Military
-		\onTurn Military
-		\onTurn Military
-
-		\toBuild Metals
-		\toBuild Dilithium
-		\toBuild Supplies
-		\toBuild Supplies
-
-		\finalize!
-
-	with Card!
-		.name = "Science Station"
-		.type = Card.Other
-
-		\onTurn Science
-
-		\toBuild Dilithium
-
-		\finalize!
-
-	with Card!
-		.name = "Class D World"
-		.type = Card.Resource
-
-		\onTurn UnionToken Dilithium, Metals
-
-		\toBuild "Money"
-
-		\finalize!
-
-	with Card!
-		.name = "Class M World"
-		.type = Card.Resource
-
-		\onTurn UnionToken Crew, Supplies
-
-		\toBuild "Money"
-
-		\finalize!
-
-	with Card!
-		.name = "Asteroid"
-		.type = Card.Resource
-
-		\onTurn Metals
-
-		\finalize!
-
-	with Card!
-		.name = "Flagship"
-		.type = Card.Military
-
-		\onTurn Military
-		\onTurn Military
-
-		\toBuild "Metals"
-		\toBuild "Dilithium"
-
-		\finalize!
-}
+tokens = require "data.tokens"
+cards = require "data.cards"
 
 Game = require "game"
 Player = require "player"
 
 game = with Game!
-	for _, card in ipairs allCards
+	for _, card in ipairs cards
 		\registerCard card
 
 	\addPlayer with Player!
@@ -130,7 +27,7 @@ game = with Game!
 
 	\finalize!
 
-print "Number of cards in game: #{#allCards}"
+print "Number of cards in game: #{#cards}"
 
 for _, player in ipairs game.players
 	print ":: #{player}"
@@ -152,8 +49,8 @@ for _, player in ipairs game.players
 			print "  - " .. tostring token
 		print
 
-		print "Can we play #{allCards[8]}?"
-		print "  -> #{\canPlayCard allCards[8]}"
+		print "Can we play #{cards[4]}?"
+		print "  -> #{\canPlayCard cards[4]}"
 		print
 
 socket = require "socket"
