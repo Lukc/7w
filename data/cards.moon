@@ -30,7 +30,7 @@ tokens = require "data.tokens"
 
 	with Card!
 		.name = "Ore Vein"
-		.type = Card.resource
+		.type = Card.Resource
 
 		\onTurn tokens.Ore
 
