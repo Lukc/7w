@@ -9,7 +9,6 @@ class extends Token
 		Token.__init @, "Union"
 
 		for _, token in ipairs {...}
-			print token
 			@[#@ + 1] = token
 
 	__tostring: =>

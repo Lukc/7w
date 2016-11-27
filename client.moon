@@ -13,7 +13,8 @@ client\settimeout 1
 
 unless playerID
 	client\send json.encode {
-		type: "new player"
+		type: "new player",
+		name: os.getenv "USER"
 	}
 	client\send "\n"
 
@@ -51,8 +52,8 @@ requests =
 		handle: (answer) =>
 			io.stdout\write (json.encode answer), "\n"
 
-			for _, player in ipairs answer.players
-				print "#{player.name} (#{player.played and "waiting" or "playing"})"
+			for id, player in ipairs answer.players
+				print "#{player.name} [#{id}] (#{player.played and "waiting" or "playing"})"
 
 				for _, card in ipairs player.playedCards
 					print "  - ", card.name

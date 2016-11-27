@@ -15,32 +15,6 @@ game = with Game!
 	for _, card in ipairs cards
 		\registerCard card
 
-print "Number of cards in game: #{#cards}"
-
-for _, player in ipairs game.players
-	print ":: #{player}"
-	with player
-		list, stats = .tokens, .tokensPerName
-
-		print "Cards in hand:"
-		for _, card in ipairs .cardsInHand
-			print "  - " .. tostring card.name
-		print
-
-		print "Played cards:"
-		for _, card in ipairs .playedCards
-			print "  - " .. tostring card.name
-		print
-
-		print "Available tokens:"
-		for _, token in ipairs list
-			print "  - " .. tostring token
-		print
-
-		print "Can we play #{cards[4]}?"
-		print "  -> #{\canPlayCard cards[4]}"
-		print
-
 socket = require "socket"
 json = require "json"
 
@@ -74,7 +48,9 @@ requests =
 		client\send "\n"
 
 	"new player": (request, client) =>
-		players[client] = Player!
+		players[client] = with Player!
+			if request.name
+				.name = request.name
 
 		_, id = @\addPlayer players[client]
 
@@ -109,12 +85,7 @@ requests =
 			}
 		client\send "\n"
 
-handle = (message, client) ->
-	request = json.decode message
-
-	if requests[request.type]
-		requests[request.type] game, request, client
-	elseif request.type == "show"
+	show: (request, client) =>
 		print "Sending public data."
 		client\send json.encode {
 			turn: game.turn,
@@ -127,7 +98,8 @@ handle = (message, client) ->
 			} for _, player in ipairs game.players]
 		}
 		client\send "\n"
-	elseif request.type == "hand"
+
+	hand: (request, client) =>
 		unless request.player
 			client\send json.encode "no 'player' field"
 			client\send "\n"
@@ -138,6 +110,12 @@ handle = (message, client) ->
 
 		client\send json.encode [card.name for _, card in ipairs player.cardsInHand]
 		client\send "\n"
+
+handle = (message, client) ->
+	request = json.decode message
+
+	if requests[request.type]
+		requests[request.type] game, request, client
 	else
 		client\send json.encode "the fuck is this '#{request.type}'"
 		client\send "\n"
@@ -147,6 +125,8 @@ port = 8888
 
 masterSocket = with socket.bind host, port
 	\settimeout 0.000001
+
+	print "7w server running on #{host}:#{port}"
 
 clients = {masterSocket}
 
