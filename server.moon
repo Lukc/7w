@@ -5,27 +5,15 @@ Card = require "card"
 
 tokens = require "data.tokens"
 cards = require "data.cards"
+wonders = require "data.wonders"
 
 Game = require "game"
 Player = require "player"
 
+players = {}
 game = with Game!
 	for _, card in ipairs cards
 		\registerCard card
-
-	\addPlayer with Player!
-		.name = "Player A"
-
-	\addPlayer with Player!
-		.name = "Player B"
-
-	\addPlayer with Player!
-		.name = "Player C"
-
-	\addPlayer with Player!
-		.name = "Player D"
-
-	\finalize!
 
 print "Number of cards in game: #{#cards}"
 
@@ -56,17 +44,47 @@ for _, player in ipairs game.players
 socket = require "socket"
 json = require "json"
 
-handle = (message, client) ->
-	request = json.decode message
+requests =
+	setname: (request, client) =>
+		unless @players[request.player]
+			client\send json.encode
+				error: "no such player"
+			client\sendd "\n"
 
-	if request.type == "setname"
-		print "Becoming #{request.name}."
-		game.players[request.player].name = request.name or game.players[request.player].name
+			return
+
+		@players[request.player].name = request.name or @players[request.player].name
+
+		client\send json.encode
+			name: request.name
+			player: request.player
+		client\send "\n"
+
+	start: (request, client) =>
+		if game.finalized
+			client\send json.encode
+				error: "Game already started!"
+			client\send "\n"
+
+			return
+		else
+			game\finalize!
 
 		client\send "{}"
 		client\send "\n"
-	elseif request.type == "play"
-		player = game.players[request.player]
+
+	"new player": (request, client) =>
+		players[client] = Player!
+
+		_, id = @\addPlayer players[client]
+
+		client\send json.encode {
+			playerID: id
+		}
+		client\send "\n"
+
+	play: (request, client) =>
+		player = @players[request.player]
 		card = player.cardsInHand[request.cardIndex]
 
 		print "Playing #{card}/#{request.cardIndex}."
@@ -75,7 +93,7 @@ handle = (message, client) ->
 		if r
 			allEnded = true
 
-			for _, player in ipairs game.players
+			for _, player in ipairs @players
 				allEnded and= player.action.type != nil
 
 				unless allEnded
@@ -90,6 +108,12 @@ handle = (message, client) ->
 				error: e
 			}
 		client\send "\n"
+
+handle = (message, client) ->
+	request = json.decode message
+
+	if requests[request.type]
+		requests[request.type] game, request, client
 	elseif request.type == "show"
 		print "Sending public data."
 		client\send json.encode {
@@ -127,12 +151,6 @@ masterSocket = with socket.bind host, port
 clients = {masterSocket}
 
 while 1 do
---	client = masterSocket\accept!
-
---	if client
---		print "New client connected."
---		table.insert clients, client
-
 	removedClients = {}
 
 	for _, client in ipairs socket.select clients, nil, 0.000001
@@ -148,7 +166,7 @@ while 1 do
 		message, failure = client\receive!
 
 		if failure == "closed"
-			print "Client lost (#{client})."
+			print "Client lost (#{client}, #{players[client]})."
 
 			table.insert removedClients, client
 

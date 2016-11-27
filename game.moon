@@ -18,6 +18,9 @@ class
 
 		table.insert @players, player
 
+		-- player, id
+		return player, #@players
+
 	nextTurn: =>
 		for _, player in ipairs @players
 			player\nextTurn!

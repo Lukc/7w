@@ -65,6 +65,12 @@ class
 		tokens = {}
 		tokensPerName = {}
 
+		if @wonder
+			for _, token in ipairs @wonder
+				table.insert tokens, token
+
+				tokensPerName[token] = (tokensPerName[token] or 0) + 1
+
 		for _, card in ipairs @playedCards
 			for _, token in ipairs card.tokensPerTurn
 				table.insert tokens, token
