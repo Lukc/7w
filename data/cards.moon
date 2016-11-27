@@ -4,7 +4,7 @@ UnionToken = require "union_token"
 
 tokens = require "data.tokens"
 
-{
+cards = with {
 	with Card!
 		.name = "Lumber Yard"
 		.type = Card.Resource
@@ -84,5 +84,51 @@ tokens = require "data.tokens"
 		\onTurn UnionToken tokens.Ore, tokens.Stone
 
 		\finalize!
+
+	with Card!
+		.name = "Press"
+		.type = Card.Manufacture
+
+		\onTurn tokens.Papyrus
+
+		\finalize!
+
+	with Card!
+		.name = "Guard Tower"
+		.type = Card.Military
+
+		\onTurn tokens.Military
+
+		\finalize!
+
+	with Card!
+		.name = "Baths"
+		.type = Card.Civilian
+
+		\onTurn tokens.Victory
+		\onTurn tokens.Victory
+		\onTurn tokens.Victory
+
+		\toBuild tokens.Stone
+
+		\finalize!
+
+	with Card!
+		.name = "Tavern"
+		.type = Card.Economic
+
+		\onBuild tokens.Money
+		\onBuild tokens.Money
+		\onBuild tokens.Money
+		\onBuild tokens.Money
+		\onBuild tokens.Money
+
+		\finalize!
 }
+	.getByName = (name) ->
+		for _, card in ipairs cards
+			if card.name == name
+				return card
+
+cards
 

@@ -2,11 +2,18 @@
 class
 	Resource: "resource"
 	Military: "military"
+	Manufacture: "manufacture"
+	Science: "science"
+	Civilian: "civilian"
+	Economic: "economic"
 	Other: "other"
 
 	new: =>
 		@tokensPerTurn = {}
 		@tokensToBuild = {}
+
+		-- For permanent tokens.
+		@tokensOnBuild = {}
 
 		@type = @@Other
 
@@ -17,6 +24,12 @@ class
 
 	toBuild: (token) =>
 		table.insert @tokensToBuild, token
+
+	onBuild: (token) =>
+		unless token.permanent
+			error "Trying pass non-permanent token to Card.onBuild"
+
+		table.insert @tokensOnBuild, token
 
 	finalize: =>
 		unless @name

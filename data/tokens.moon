@@ -38,5 +38,15 @@ UnionToken = require "union_token"
 
 	Compass: with Token "Compass"
 		\finalize!
+
+	-- Permanent tokens
+	Money: with Token "Money"
+		.permanent = true
+
+		\finalize!
+
+	-- Victory \o/
+	Victory: with Token "Victory"
+		\finalize!
 }
 

@@ -14,6 +14,8 @@ class
 
 		@action = {}
 
+		@tokens = {}
+
 		@\updateTokens!
 
 	canPlayCard: (card) =>
@@ -53,34 +55,38 @@ class
 
 						break
 
+				for _, token in ipairs @action.card.tokensOnBuild
+					table.insert @tokens, token
+
 				table.insert @playedCards, @action.card
 			else
 				return nil, "has not played"
 
 		@action = {}
 
+		@\updateTokens!
+
 		true
 
 	updateTokens: =>
 		tokens = {}
-		tokensPerName = {}
+
+		for _, token in ipairs @tokens
+			print token
+			if token.permanent
+				table.insert tokens, token
 
 		if @wonder
 			for _, token in ipairs @wonder
 				table.insert tokens, token
 
-				tokensPerName[token] = (tokensPerName[token] or 0) + 1
-
 		for _, card in ipairs @playedCards
 			for _, token in ipairs card.tokensPerTurn
 				table.insert tokens, token
 
-				tokensPerName[token] = (tokensPerName[token] or 0) + 1
-
 		@tokens = tokens
-		@tokensPerName = @tokensPerName
 
-		tokens, tokensPerName
+		tokens
 
 	__tostring: =>
 		"<Player: '#{@name}', #{#@playedCards} cards played>"

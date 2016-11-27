@@ -7,6 +7,9 @@ class
 	finalize: =>
 		@finalized = true
 
+	stringify: =>
+		@name
+
 	__tostring: =>
 		"<Token: '#{@name}'>"
 

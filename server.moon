@@ -10,6 +10,8 @@ wonders = require "data.wonders"
 Game = require "game"
 Player = require "player"
 
+math.randomseed os.time!
+
 players = {}
 game = with Game!
 	for _, card in ipairs cards
@@ -57,6 +59,13 @@ requests =
 		client\send json.encode {
 			playerID: id
 		}
+		client\send "\n"
+
+	tokens: (request, client) =>
+		player = @players[request.player]
+
+		client\send json.encode
+			list: [token\stringify! for _, token in ipairs player.tokens]
 		client\send "\n"
 
 	play: (request, client) =>

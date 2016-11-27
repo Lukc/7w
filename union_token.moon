@@ -11,6 +11,9 @@ class extends Token
 		for _, token in ipairs {...}
 			@[#@ + 1] = token
 
+	stringify: =>
+		table.concat [token.name for _, token in ipairs @], "/"
+
 	__tostring: =>
 		names = map (=> "'#{@name}'"), @
 
